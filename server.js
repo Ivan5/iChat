@@ -9,11 +9,11 @@ mongo.connect('mongodb://127.0.0.1/ichat',(err,db)=>{
   console.log('MongoDB connected ');
 
   //Connect to Socket.io
-  client.on('connection',()=>{
+  client.on('connection',(socket)=>{
     let chat = db.collection('chats');
     //Create fun to send status
     sendStatus = function(s){
-      client.emit('status',s);
+      socket.emit('status',s);
     }
 
     //Get chats from mongo collection
@@ -23,11 +23,11 @@ mongo.connect('mongodb://127.0.0.1/ichat',(err,db)=>{
       }
 
       //Emit the messages
-      client.emit('output',res);
+      socket.emit('output',res);
     });
 
     //Handle input events
-    client.on('input',(data)=>{
+    socket.on('input',(data)=>{
       let name = data.name;
       let message = data.message;
 
@@ -49,11 +49,11 @@ mongo.connect('mongodb://127.0.0.1/ichat',(err,db)=>{
       }
     });
     //Headle clear
-    client.on('clear',(data)=>{
+    socket.on('clear',(data)=>{
       //Remove all chats
       chat.remove({},()=>{
         //Emit cleard
-        client.emit('Clear');
+        socket.emit('Clear');
       });
     });
   });
